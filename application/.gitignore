@@ -475,3 +475,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+obj/application.csproj.nuget.dgspec.json
+obj/project.nuget.cache
+obj/project.assets.json
