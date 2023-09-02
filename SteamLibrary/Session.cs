@@ -1,6 +1,7 @@
 ﻿using System;
 using SteamKit2;
 using SteamKit2.Authentication;
+using SteamKit2.CDN;
 
 namespace SteamLibrary;
 
@@ -16,6 +17,18 @@ public class Session
     // connection
     private bool _isRunning;
 
+    public SteamClient Client {
+        get{
+            return _steamClient;
+        }
+    }
+
+    public CallbackManager Manager{
+        get {
+            return _manager;
+        }
+    }
+
     public Session(Credentials account){
         _credentials = account;
         // create our steamclient instance
@@ -24,6 +37,7 @@ public class Session
         _manager = new CallbackManager(_steamClient);
         // get the steamuser handler, which is used for logging on after successfully connecting
         _steamUser = _steamClient.GetHandler<SteamUser>();
+        
         _isRunning = false;
         // register a few callbacks we're interested in
         // these are registered upon creation to a callback manager, which will then route the callbacks
@@ -90,9 +104,6 @@ public class Session
         // at this point, we'd be able to perform actions on Steam
         
         // ...
-
-        // for this sample we'll just log off
-        _steamUser.LogOff();
     }
 
     void OnLoggedOff( SteamUser.LoggedOffCallback callback )
