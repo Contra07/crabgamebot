@@ -8,7 +8,11 @@ namespace SteamLibrary;
 
 public static class JSONUtils
 {
-    public static List<Account> ReadUsers(string path){
-        return JsonSerializer.Deserialize<List<Account>>(File.ReadAllText(path));
+    public static List<Credentials> ReadUsers(string path){
+        JsonSerializerOptions options = new (){
+            WriteIndented = true,
+            IncludeFields = true
+        };
+        return JsonSerializer.Deserialize<List<Credentials>>(File.ReadAllText(path), options);
     }
 }
