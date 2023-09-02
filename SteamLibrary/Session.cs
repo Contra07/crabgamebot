@@ -2,6 +2,7 @@
 using SteamKit2;
 using SteamKit2.Authentication;
 using SteamKit2.CDN;
+using SteamKit2.GC.CSGO.Internal;
 
 namespace SteamLibrary;
 
@@ -16,6 +17,12 @@ public class Session
     private SteamUser _steamUser;
     // connection
     private bool _isRunning;
+
+    public Credentials Account{
+        get{
+            return _credentials;
+        }
+    }
 
     public SteamClient Client {
         get{

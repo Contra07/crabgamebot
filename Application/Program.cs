@@ -9,7 +9,7 @@ namespace Application;
 public class Program
 {
     public static void Main(string[] args){
-        List<Credentials> users = JSONUtils.ReadUsers(args[0]);
+        List<Credentials> users = JSONUtils.ParseUsers(args[0]);
         List<Session> sessions = new List<Session>();
         foreach(var user in users){
             var session = new Session(user);
