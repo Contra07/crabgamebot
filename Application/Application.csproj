@@ -1,11 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\SteamLibrary\SteamLibrary.csproj" />
+    <Compile Remove="data\**" />
+    <EmbeddedResource Remove="data\**" />
+    <None Remove="data\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Build.Containers" Version="7.0.400" />
+    <ProjectReference Include="..\SteamLibrary\SteamLibrary.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -3,6 +3,7 @@ using SteamKit2;
 using SteamKit2.Authentication;
 using SteamKit2.CDN;
 using SteamKit2.GC.CSGO.Internal;
+using SteamLibrary.JSONs;
 
 namespace SteamLibrary;
 
@@ -43,7 +44,7 @@ public class Session
         // create the callback manager which will route callbacks to function calls
         _manager = new CallbackManager(_steamClient);
         // get the steamuser handler, which is used for logging on after successfully connecting
-        _steamUser = _steamClient.GetHandler<SteamUser>();
+        //_steamUser = _steamClient.GetHandler<SteamUser>();
         
         _isRunning = false;
         // register a few callbacks we're interested in
@@ -58,12 +59,15 @@ public class Session
     public void Connect(){
         // initiate the connection
         _steamClient.Connect();
+    }
+
+    public void Start() {
         // create our callback handling loop
         _isRunning = true;
-        while ( _isRunning )
+        while (_isRunning)
         {
             // in order for the callbacks to get routed, they need to be handled by the manager
-            _manager.RunWaitCallbacks( TimeSpan.FromSeconds( 1 ) );
+            _manager.RunWaitAllCallbacks(TimeSpan.FromMilliseconds(1000));
         }
     }
 
@@ -85,7 +89,7 @@ public class Session
 
         // Logon to Steam with the access token we have received
         // Note that we are using RefreshToken for logging on here
-        _steamUser.LogOn( new SteamUser.LogOnDetails
+        _steamClient.GetHandler<SteamUser>()?.LogOn( new SteamUser.LogOnDetails
         {
             Username = pollResponse.AccountName,
             AccessToken = pollResponse.RefreshToken,
