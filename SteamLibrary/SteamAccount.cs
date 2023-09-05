@@ -18,9 +18,10 @@ namespace SteamLibrary
         private bool _isRunning;
 
         public string Username { get { return _credentials.Login; } }
-        public string Password { get { return _credentials.Password; } }
-        public SteamClient SteamClient { get { return _steamClient; } }
-        public CallbackManager CallbackManager { get { return _callbackManager; } }
+        internal string Password { get { return _credentials.Password; } }
+        internal string Secret { get { return _credentials.Secret; } }
+        internal SteamClient SteamClient { get { return _steamClient; } }
+        internal CallbackManager CallbackManager { get { return _callbackManager; } }
 
         public SteamAccount(Credentials credentials)
         {

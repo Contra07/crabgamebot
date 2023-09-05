@@ -1,34 +1,42 @@
 ﻿using SteamKit2;
-using SteamKit2.Authentication;
 using SteamKit2.Internal;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using static SteamKit2.GC.Dota.Internal.CMsgDOTABotDebugInfo;
 
 namespace SteamLibrary.Services
 {
-    public class PlayService
+    public class PlayService: Service
     {
-        private SteamAccount _account;
-
-        public PlayService(SteamAccount account)
-        {
-            _account = account;
-            _account.CallbackManager.Subscribe<SteamUser.LoggedOnCallback>(OnLogon);
+        private Thread _thread;
+        private int _appid;
+        public PlayService(SteamAccount account, Logger logger): base (account, logger, "Play") {
+            _thread = new Thread(GameLoop);
+            _appid = 1782210;
         }
 
-        public void OnLogon(SteamUser.LoggedOnCallback callback) {
+        protected override void Subscribe()
+        {
+            _callbackFunctionPointers = new List<IDisposable> {
+                _account.CallbackManager.Subscribe<SteamUser.LoggedOnCallback>(OnLogon),
+                _account.CallbackManager.Subscribe<SteamClient.DisconnectedCallback>(OnDisconnect)
+            };
+        }
+
+        private void OnDisconnect(SteamClient.DisconnectedCallback callback) {
+            _thread.Interrupt();
+            _logger.Log("Stopping playing game");
+        }
+
+        private void OnLogon(SteamUser.LoggedOnCallback callback) {
 
             if (callback.Result == EResult.OK) {
-                new Thread(PlayGame).Start();
+                PlayGame();
+                _thread.Start();
             }
         }
 
-        public void PlayGame() {
+        private void PlayGame() {
             ClientMsgProtobuf<CMsgClientGamesPlayed> request = new(EMsg.ClientGamesPlayedWithDataBlob)
             {
                 Body = {
@@ -36,12 +44,26 @@ namespace SteamLibrary.Services
 				        client_os_type = unchecked((uint) EOSType.Windows10)
                     }
             };
-            request.Body.games_played.Add(new CMsgClientGamesPlayed.GamePlayed { game_id = new GameID(1782210) });
+            request.Body.games_played.Add(new CMsgClientGamesPlayed.GamePlayed { game_id = new GameID(_appid) });
             _account.SteamClient.Send(request);
-            while (true)
-            {
-                Thread.Sleep(TimeSpan.FromMinutes(300));
-            }
+            _logger.Log($"Start playing game");
         }
+
+        private void GameLoop() {
+            try
+            {
+                TimeSpan time = TimeSpan.FromMinutes(150);
+                while (true)
+                {
+                    _logger.Log($"Started play game for {time}");
+                    Thread.Sleep(time);
+                }
+            }
+            catch(ThreadInterruptedException ex) {
+                _logger.Log($"Stoped playing game");
+            }
+            
+        }
+
     }
 }

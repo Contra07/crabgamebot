@@ -2,27 +2,26 @@
 using SteamKit2;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static SteamKit2.Internal.CMsgBluetoothDevicesData;
 
 namespace SteamLibrary.Services
 {
-    public class LoginService
+    public class LoginService : Service
     {
-        private SteamAccount _account;
-        public LoginService(SteamAccount account) {
-            _account = account;
-            _account.CallbackManager.Subscribe<SteamClient.ConnectedCallback>(OnConnected);
-            _account.CallbackManager.Subscribe<SteamClient.DisconnectedCallback>(OnDisconnected);
-            _account.CallbackManager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn);
-            _account.CallbackManager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOff);
+        public LoginService(SteamAccount account, Logger logger) : base(account, logger, "Login") { }
+
+        protected override void Subscribe()
+        {
+            _callbackFunctionPointers = new List<IDisposable> {
+                _account.CallbackManager.Subscribe<SteamClient.ConnectedCallback>(OnConnected),
+                _account.CallbackManager.Subscribe<SteamClient.DisconnectedCallback>(OnDisconnected),
+                _account.CallbackManager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn),
+                _account.CallbackManager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOff),
+            };
         }
 
-        async void OnConnected(SteamClient.ConnectedCallback callback)
+        private async void OnConnected(SteamClient.ConnectedCallback callback)
         {
-            Log("Connected to Steam! Logging in ...");
+            _logger.Log("Connected to Steam! Logging in ...");
 
             // Begin authenticating via credentials
             CredentialsAuthSession authSession = await _account.SteamClient.Authentication.BeginAuthSessionViaCredentialsAsync(new AuthSessionDetails
@@ -31,7 +30,7 @@ namespace SteamLibrary.Services
                 Password = _account.Password,
                 IsPersistentSession = true,
                 ClientOSType = EOSType.Windows10,
-                Authenticator = new UserConsoleAuthenticator(),
+                Authenticator = new SteamAuthAuthenticator(_account, _logger),
             });
 
             // Starting polling Steam for authentication response
@@ -46,30 +45,26 @@ namespace SteamLibrary.Services
             });
         }
 
-        void OnDisconnected(SteamClient.DisconnectedCallback callback)
+        private void OnDisconnected(SteamClient.DisconnectedCallback callback)
         {
             _account.Disconnect();
-            Log("Disconnected from Steam");
+            _logger.Log("Disconnected from Steam");
         }
 
-        void OnLoggedOn(SteamUser.LoggedOnCallback callback)
+        private void OnLoggedOn(SteamUser.LoggedOnCallback callback)
         {
             if (callback.Result != EResult.OK)
             {
-                Log($"Unable to logon to Steam: {callback.Result} / {callback.ExtendedResult}");
+                _logger.Log($"Unable to logon to Steam: {callback.Result} / {callback.ExtendedResult}");
                 _account.Disconnect();
                 return;
             }
-            Log("Successfully logged on!");
+            _logger.Log("Successfully logged on!");
         }
 
-        void OnLoggedOff(SteamUser.LoggedOffCallback callback)
+        private void OnLoggedOff(SteamUser.LoggedOffCallback callback)
         {
-            Log($"Logged off of Steam: {callback.Result}");
-        }
-
-        private void Log(string log) { 
-            Console.WriteLine($"[{_account.Username,15}]: {log}");
+            _logger.Log($"Logged off of Steam: {callback.Result}");
         }
     }
 }

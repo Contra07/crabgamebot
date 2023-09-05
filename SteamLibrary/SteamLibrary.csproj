@@ -10,4 +10,8 @@
     <PackageReference Include="SteamKit2" Version="2.5.0-Beta.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SteamAuth\SteamAuth.csproj" />
+  </ItemGroup>
+
 </Project>
