@@ -18,7 +18,19 @@ public class Program
         {
             new Thread(client.Start).Start(); 
         }
-        while (Console.ReadKey().KeyChar != 'p') { }
+        var run = true;
+        Thread th = new Thread(() =>
+        {
+            while (run)
+            {
+                run = Console.ReadKey(false).KeyChar != 'p';
+                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+            }
+        });
+        th.Start();
+        while (run) {
+            Thread.Sleep(TimeSpan.FromMilliseconds(100));
+        }
         Console.WriteLine();
         foreach (Client client in clients)
         {

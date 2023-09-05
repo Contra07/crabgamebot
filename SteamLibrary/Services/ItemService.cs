@@ -18,6 +18,7 @@ namespace SteamLibrary.Services
         private JobID _consumePlaytimeRequestID;
         private JobID _exchangeItemID;
         private Thread _thread;
+        private int _tries;
 
         public ItemService(SteamAccount account, Logger logger): base(account, logger, "Item")
         {
@@ -27,6 +28,7 @@ namespace SteamLibrary.Services
             _steamUnifiedMessages = _account.SteamClient.GetHandler<SteamUnifiedMessages>();
             _inventoryService = _steamUnifiedMessages.CreateService<IInventory>();
             _thread = new Thread(CaseLoop);
+            _tries = 3;
         }
 
         protected override void Subscribe() {
@@ -105,11 +107,17 @@ namespace SteamLibrary.Services
 
         private void CaseLoop() {
             try {
+                int passes = 0;
                 while (true)
                 {
-                    ConsumeTime();
-                    GetInventory();
-                    Thread.Sleep(TimeSpan.FromMinutes(5));
+                    while (passes < _tries) {
+                        ConsumeTime();
+                        //GetInventory();
+                        Thread.Sleep(TimeSpan.FromMinutes(0.5));
+                        passes++;
+                    }
+                    _logger.Log("Whating next day");
+                    Thread.Sleep(TimeSpan.FromHours(12));
                 }
             }
             catch (ThreadInterruptedException ex)
