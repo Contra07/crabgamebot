@@ -10,55 +10,62 @@ using System.Threading;
 
 namespace SteamLibrary.Services
 {
-    public class ItemService
+    public class ItemService: Service
     {
         private SteamUnifiedMessages _steamUnifiedMessages;
         private SteamUnifiedMessages.UnifiedService<IInventory> _inventoryService;
         private JobID _inventoryRequestID;
         private JobID _consumePlaytimeRequestID;
         private JobID _exchangeItemID;
-        private SteamAccount _account;
+        private Thread _thread;
 
-        public ItemService(SteamAccount account)
+        public ItemService(SteamAccount account, Logger logger): base(account, logger, "Item")
         {
-            _account = account;
             _exchangeItemID = JobID.Invalid;
             _consumePlaytimeRequestID = JobID.Invalid;
             _inventoryRequestID = JobID.Invalid;
             _steamUnifiedMessages = _account.SteamClient.GetHandler<SteamUnifiedMessages>();
             _inventoryService = _steamUnifiedMessages.CreateService<IInventory>();
-            _account.CallbackManager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn);
-            _account.CallbackManager.Subscribe<SteamUnifiedMessages.ServiceMethodResponse>(OnUnifiedMessageResponse);
+            _thread = new Thread(CaseLoop);
         }
 
-        public void OnLoggedOn(SteamUser.LoggedOnCallback callback)
+        protected override void Subscribe() {
+            _callbackFunctionPointers = new List<IDisposable> {
+                _account.CallbackManager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn),
+                _account.CallbackManager.Subscribe<SteamUnifiedMessages.ServiceMethodResponse>(OnUnifiedMessageResponse),
+                _account.CallbackManager.Subscribe<SteamClient.DisconnectedCallback>(OnDisconnected)
+            };
+        }
+
+        private void OnLoggedOn(SteamUser.LoggedOnCallback callback)
         {
             if (callback.Result == EResult.OK)
             {
-                new Thread(() => {
-                    ConsumeTime();
-                    GetInventory();
-                    Thread.Sleep(TimeSpan.FromMinutes(5));
-                }).Start();
+                _thread.Start();
+                _logger.Log("Started case loop");
             }
         }
 
-        public void OnUnifiedMessageResponse(SteamUnifiedMessages.ServiceMethodResponse callback)
+        private void OnDisconnected(SteamClient.DisconnectedCallback callback) {
+            _logger.Log("Case loop stopping...");
+            _thread.Interrupt();
+        }
+
+
+        private void OnUnifiedMessageResponse(SteamUnifiedMessages.ServiceMethodResponse callback)
         {
             if (callback.JobID == _consumePlaytimeRequestID) {
                 CInventory_Response resp = callback.GetDeserializedResponse<CInventory_Response>();
-                Log($"Consuming playtime... {resp.etag} ,{resp.itemdef_json} , {resp.ticket}, {resp.replayed}");
-                foreach (var id in resp.removeditemids) {
-                    Log($"removed: {id}");
-                }
+                _logger.Log($"Consuming playtime...");
                 List<InventoryItem> items = JSONUtils.ParseInventory(resp.item_json);
                 foreach (InventoryItem item in items) {
-                    Log($"Consumed {item.itemdefid}");
+                    _logger.Log($"Consumed {item.itemdefid}");
                 }
                 _consumePlaytimeRequestID = JobID.Invalid;
+                GetInventory();
             }
             if (callback.JobID == _inventoryRequestID) {
-                Log($"Checking inventory...");
+                _logger.Log($"Checking inventory...");
                 CInventory_Response resp = callback.GetDeserializedResponse<CInventory_Response>();
                 List<InventoryItem> items = JSONUtils.ParseInventory(resp.item_json);
                 List<InventoryItem> cases = new List<InventoryItem>();
@@ -70,40 +77,59 @@ namespace SteamLibrary.Services
                         item.itemdefid == "1003")
                     {
                         cases.Add(item);
-                        Log($"case: {item.itemdefid}");
+                        _logger.Log($"Found case: {item.itemdefid}");
                     }
                 }
                 if (cases.Count() != 0)
                 {
                     foreach (var crabcase in cases)
                     {
-                        CInventory_ExchangeItem_Request req = new CInventory_ExchangeItem_Request
-                        {
-                            appid = 1782210,
-                            outputitemdefid = 1302 - 1000 + ulong.Parse(crabcase.itemdefid)
-                        };
-                        req.materialsitemid.Add(ulong.Parse(crabcase.itemid));
-                        req.materialsquantity.Add(1);
-                        Log("Opening case...");
-                        Log(JSONUtils.SerializeInventoryItem(crabcase));
-                        _exchangeItemID = _inventoryService.SendMessage(x => x.ExchangeItem(req));
+                        _logger.Log("Opening case: " + crabcase.itemdefid);
+                        OpenCase(crabcase.itemdefid, crabcase.itemid);
                     }
                 }
                 else {
-                    Log("No cases");
+                    _logger.Log("No cases");
                 }
                 _inventoryRequestID = JobID.Invalid;
             }
             if (callback.JobID == _exchangeItemID){
                 CInventory_Response resp = callback.GetDeserializedResponse<CInventory_Response>();
-                Log($"Openned case! {resp.etag}");
+                _logger.Log($"Openned case!");
                 List<InventoryItem> items = JSONUtils.ParseInventory(resp.item_json);
-                foreach (InventoryItem item in items){
-                    Log(JSONUtils.SerializeInventoryItem(item));
-                }
+                _logger.Log($"Consumed case: {items[0].itemdefid}");
+                _logger.Log($"Got item: {items[1].itemdefid}");
                 _exchangeItemID = JobID.Invalid;
             }
         }
+
+        private void CaseLoop() {
+            try {
+                while (true)
+                {
+                    ConsumeTime();
+                    GetInventory();
+                    Thread.Sleep(TimeSpan.FromMinutes(5));
+                }
+            }
+            catch (ThreadInterruptedException ex)
+            {
+                _logger.Log("Case loop stopped");
+            }
+            
+        }
+
+        private void OpenCase(string caseid, string itemid) {
+            CInventory_ExchangeItem_Request req = new CInventory_ExchangeItem_Request
+            {
+                appid = 1782210,
+                outputitemdefid = 1302 - 1000 + ulong.Parse(caseid)
+            };
+            req.materialsitemid.Add(ulong.Parse(itemid));
+            req.materialsquantity.Add(1);
+            _exchangeItemID = _inventoryService.SendMessage(x => x.ExchangeItem(req));
+        }
+
         private void ConsumeTime(){
             CInventory_ConsumePlaytime_Request req2 = new CInventory_ConsumePlaytime_Request { appid = 1782210, itemdefid = 1200 };
             _consumePlaytimeRequestID = _inventoryService.SendMessage(x => x.ConsumePlaytime(req2));
@@ -112,11 +138,6 @@ namespace SteamLibrary.Services
         private void GetInventory() {
             CInventory_GetInventory_Request req3 = new CInventory_GetInventory_Request { appid = 1782210 };
             _inventoryRequestID = _inventoryService.SendMessage(x => x.GetInventory(req3));
-        }
-
-        private void Log(string log)
-        {
-            Console.WriteLine($"[{_account.Username,15}]: {log}");
         }
     }
 }
