@@ -19,15 +19,15 @@ public class Program
             new Thread(client.Start).Start(); 
         }
         var run = true;
-        Thread th = new Thread(() =>
-        {
-            while (run)
-            {
-                run = Console.ReadKey(false).KeyChar != 'p';
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
-            }
-        });
-        th.Start();
+        // Thread th = new Thread(() =>
+        // {
+        //     while (run)
+        //     {
+        //         run = Console.ReadKey(false).KeyChar != 'p';
+        //         Thread.Sleep(TimeSpan.FromMilliseconds(100));
+        //     }
+        // });
+        // th.Start();
         while (run) {
             Thread.Sleep(TimeSpan.FromMilliseconds(100));
         }
@@ -51,6 +51,7 @@ public class Program
                 new LoginService(Account, Logger),
                 new ItemService(Account, Logger),
                 new PlayService(Account, Logger),
+                new EconService(Account, Logger)
             };
         }
 

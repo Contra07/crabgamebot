@@ -20,6 +20,16 @@ namespace SteamLibrary
                 _baseColor++;
                 _color++;
             }
+        }
+
+        public void Log(string log)
+        {
+            string template = $"[{DateTime.Now.TimeOfDay}][{_account.Username,25}]: {log}";
+            ConsoleLog(template);
+            //FileLog(template);
+        }
+
+        private void SaveLogs(){
             var dir = Directory.CreateDirectory("./logs");
             if (File.Exists(_path))
             {
@@ -31,13 +41,6 @@ namespace SteamLibrary
                 }
                 using (var nf = File.CreateText(_path)) { }
             }
-        }
-
-        public void Log(string log)
-        {
-            string template = $"[{DateTime.Now.TimeOfDay}][{_account.Username,25}]: {log}";
-            ConsoleLog(template);
-            FileLog(template);
         }
 
         private void FileLog(string log) {

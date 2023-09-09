@@ -52,7 +52,7 @@ namespace SteamLibrary.Services
         private void GameLoop() {
             try
             {
-                TimeSpan time = TimeSpan.FromMinutes(150);
+                TimeSpan time = TimeSpan.FromHours(12);
                 while (true)
                 {
                     _logger.Log($"Started play game for {time}");

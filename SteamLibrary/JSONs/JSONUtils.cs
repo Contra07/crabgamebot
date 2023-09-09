@@ -22,6 +22,16 @@ public static class JSONUtils
         return JsonSerializer.Deserialize<List<InventoryItem>>(json);
     }
 
+    public static MarketPrice ParsePrice(string json)
+    {
+        return JsonSerializer.Deserialize<MarketPrice>(json);
+    }
+
+    public static ItemList ParseItemList(string json)
+    {
+        return JsonSerializer.Deserialize<ItemList>(json);
+    }
+
     public static string SerializeInventoryItem(InventoryItem item)
     {
         JsonSerializerOptions options = new()
