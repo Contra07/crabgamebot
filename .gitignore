@@ -399,5 +399,5 @@ data/
 
 # devcontanier
 
-.devcontanier
-
+.devcontanier/
+.devcontainer/devcontainer.json
