@@ -17,22 +17,31 @@ public static class JSONUtils
         return JsonSerializer.Deserialize<List<Credentials>>(File.ReadAllText(path), options);
     }
 
-    public static List<InventoryItem> ParseInventory(string json)
+    public static List<InventoryItemDef> ParseInventoryItemDefs(string json)
     {
-        return JsonSerializer.Deserialize<List<InventoryItem>>(json);
+        return JsonSerializer.Deserialize<List<InventoryItemDef>>(json);
     }
 
-    public static MarketPrice ParsePrice(string json)
+    public static AssetMarketPrice ParseAssetMarketPrice(string json)
     {
-        return JsonSerializer.Deserialize<MarketPrice>(json);
+        return JsonSerializer.Deserialize<AssetMarketPrice>(json);
     }
 
-    public static ItemList ParseItemList(string json)
+    public static List<GameItemDef> ParseGameItemDefs(string json)
     {
-        return JsonSerializer.Deserialize<ItemList>(json);
+        return JsonSerializer.Deserialize<List<GameItemDef>>(json);
     }
 
-    public static string SerializeInventoryItem(InventoryItem item)
+    public static GameAssetsPage ParseGameAssetPage(string json)
+    {
+        return JsonSerializer.Deserialize<GameAssetsPage>(json);
+    }
+
+    public static InventoryAssets ParseInventoryAssets(string json) {
+        return JsonSerializer.Deserialize<InventoryAssets>(json);
+    }
+
+    public static string SerializeInventoryItem(InventoryItemDef item)
     {
         JsonSerializerOptions options = new()
         {

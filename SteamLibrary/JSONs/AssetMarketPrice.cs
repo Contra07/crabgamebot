@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SteamLibrary.JSONs
 {
-    public class MarketPrice
+    public class AssetMarketPrice
     {
         [JsonPropertyName("success")]
         public bool success { get; set; }

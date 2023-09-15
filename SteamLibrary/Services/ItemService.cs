@@ -3,14 +3,13 @@ using SteamKit2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SteamLibrary.JSONs;
 using System.Threading;
+using SteamLibrary.Callbacks;
 
 namespace SteamLibrary.Services
 {
-    public class ItemService: Service
+    public class ItemService: Service 
     {
         private SteamUnifiedMessages _steamUnifiedMessages;
         private SteamUnifiedMessages.UnifiedService<IInventory> _inventoryService;
@@ -18,8 +17,6 @@ namespace SteamLibrary.Services
         private List<JobID> _consumePlaytimeRequestIDs;
         private JobID _exchangeItemRequestID;
         private JobID _getItemDefMetaRequestID;
-        private JobID _getEligiblePromoItemDefIDsRequestID;
-        private List<JobID> _inspectItemRequestIDs;
         private Thread _thread;
         private int _tries;
 
@@ -29,11 +26,8 @@ namespace SteamLibrary.Services
             _consumePlaytimeRequestIDs = new List<JobID>();
             _getInventoryRequestID = JobID.Invalid;
             _getItemDefMetaRequestID = JobID.Invalid;
-            _getEligiblePromoItemDefIDsRequestID = JobID.Invalid;
-            _inspectItemRequestIDs = new List<JobID>();
             _steamUnifiedMessages = _account.SteamClient.GetHandler<SteamUnifiedMessages>();
             _inventoryService = _steamUnifiedMessages.CreateService<IInventory>();
-            _steamUnifiedMessages.CreateService<IMarketingMessages>();
             _thread = new Thread(CaseLoop);
             _tries = 7;
         }
@@ -69,7 +63,7 @@ namespace SteamLibrary.Services
             }
             if (callback.JobID == _getInventoryRequestID) {
                 _getInventoryRequestID = JobID.Invalid;
-                //InspectEachItem(callback.GetDeserializedResponse<CInventory_Response>());
+                _account.SteamClient.PostCallback(new CrarGameCaseOppened(callback));
                 var cases = FindCases(callback.GetDeserializedResponse<CInventory_Response>());
                 OpenCases(cases);
             }
@@ -80,18 +74,8 @@ namespace SteamLibrary.Services
             if (callback.JobID == _getItemDefMetaRequestID) {
                 _getItemDefMetaRequestID = JobID.Invalid;
                 CInventory_GetItemDefMeta_Response resp = callback.GetDeserializedResponse<CInventory_GetItemDefMeta_Response>();
+                var items = SteamMarket.GetGameItemDefs("1782210", resp.digest);
             }
-            if (_inspectItemRequestIDs.Contains(callback.JobID)) {
-                _inspectItemRequestIDs.Remove(callback.JobID);
-                CInventory_Response resp = callback.GetDeserializedResponse<CInventory_Response>();
-                _logger.Log(resp.itemdef_json.ToString());
-                //List<InventoryItem> items = JSONUtils.ParseInventory(resp.item_json);
-            }
-            if (callback.JobID == _getEligiblePromoItemDefIDsRequestID) {
-                CInventory_GetEligiblePromoItemDefIDs_Response resp = callback.GetDeserializedResponse<CInventory_GetEligiblePromoItemDefIDs_Response>();
-                _getEligiblePromoItemDefIDsRequestID = JobID.Invalid;
-            }
-            
         }
 
         private void CaseLoop()
@@ -103,10 +87,8 @@ namespace SteamLibrary.Services
                 {
                     while (passes < _tries)
                     {
-                        //_GetItemDefMetaRequestID =  GetItemDefMeta();
+                        _getItemDefMetaRequestID =  GetItemDefMeta();
                         _consumePlaytimeRequestIDs.Add(ConsumePlaytime());
-                        _getEligiblePromoItemDefIDsRequestID = GetEligiblePromoItemDefIDs();
-                        //GetInventory();
                         Thread.Sleep(TimeSpan.FromMinutes(15));
                         passes++;
                     }
@@ -120,21 +102,25 @@ namespace SteamLibrary.Services
             }
         }
 
-        private void GetCase(CInventory_Response resp) {
+        private async void GetCase(CInventory_Response resp) {
             _logger.Log($"Consuming playtime...");
-            List<InventoryItem> items = JSONUtils.ParseInventory(resp.item_json);
-            foreach (InventoryItem item in items)
+            List<InventoryItemDef> items = JSONUtils.ParseInventoryItemDefs(resp.item_json);
+            foreach (InventoryItemDef item in items)
             {
                 _logger.Log($"Consumed {item.itemdefid}");
             }
+
+            //var a = GetInventory();
+            //CInventory_Response b = (await a).GetDeserializedResponse<CInventory_Response>();
+
             _getInventoryRequestID = GetInventory();
         }
 
 
-        private List<InventoryItem> FindCases(CInventory_Response resp) {
+        private List<InventoryItemDef> FindCases(CInventory_Response resp) {
             _logger.Log($"Checking inventory...");
-            List<InventoryItem> items = JSONUtils.ParseInventory(resp.item_json);
-            List<InventoryItem> cases = new List<InventoryItem>();
+            List<InventoryItemDef> items = JSONUtils.ParseInventoryItemDefs(resp.item_json);
+            List<InventoryItemDef> cases = new List<InventoryItemDef>();
             foreach (var item in items)
             {
                 if (item.itemdefid == "1000" ||
@@ -149,7 +135,7 @@ namespace SteamLibrary.Services
             return cases;
         }
 
-        private void OpenCases(List<InventoryItem> cases) { 
+        private void OpenCases(List<InventoryItemDef> cases) { 
             if (cases.Count() != 0)
             {
                 foreach (var crabcase in cases)
@@ -166,20 +152,11 @@ namespace SteamLibrary.Services
 
         private void OpennedCase(CInventory_Response resp) {
             _logger.Log($"Openned case!");
-            List<InventoryItem> items = JSONUtils.ParseInventory(resp.item_json);
+            List<InventoryItemDef> items = JSONUtils.ParseInventoryItemDefs(resp.item_json);
             _logger.Log($"Consumed case: {items[0].itemdefid}");
             _logger.Log($"Got item: {items[1].itemdefid}");
         }
 
-        private void InspectEachItem(CInventory_Response resp) {
-            List<InventoryItem> items = JSONUtils.ParseInventory(resp.item_json);
-            foreach (var item in items)
-            {
-                _logger.Log($"Inspecting item: {item.itemdefid}");
-                _inspectItemRequestIDs.Add(InspectItem(ulong.Parse(item.itemid), ulong.Parse(item.itemdefid), item.tags));
-                Thread.Sleep(100);
-            }
-        }
                 
 
         private JobID ExchangeItem(ulong itemdefid, ulong itemid) {
@@ -200,7 +177,7 @@ namespace SteamLibrary.Services
             return _inventoryService.SendMessage(x => x.ConsumePlaytime(req));
         }
 
-        private JobID GetInventory() {
+        private AsyncJob<SteamUnifiedMessages.ServiceMethodResponse> GetInventory() {
             CInventory_GetInventory_Request req = new CInventory_GetInventory_Request {
                 appid = 1782210 
             };
@@ -212,24 +189,6 @@ namespace SteamLibrary.Services
                 appid = 1782210,
             };
             return _inventoryService.SendMessage(x => x.GetItemDefMeta(req));
-        }
-
-        private JobID InspectItem(ulong itemid, ulong itemdefid, string tags)
-        {
-            CInventory_InspectItem_Request req = new CInventory_InspectItem_Request
-            {
-                itemid = itemid,
-                itemdefid = itemdefid,
-                tags = tags
-            };
-            return _inventoryService.SendMessage(x => x.InspectItem(req));
-        }
-
-        private JobID GetEligiblePromoItemDefIDs()
-        {
-            CInventory_GetEligiblePromoItemDefIDs_Request req = new CInventory_GetEligiblePromoItemDefIDs_Request();
-            { };
-            return _inventoryService.SendMessage(x => x.GetEligiblePromoItemDefIDs(req));
         }
     }
 }

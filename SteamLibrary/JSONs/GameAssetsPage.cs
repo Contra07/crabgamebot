@@ -32,7 +32,7 @@ namespace SteamLibrary.JSONs
         public string icon_url_large { get; set; }
 
         [JsonPropertyName("descriptions")]
-        public List<Description> descriptions { get; set; }
+        public List<GameDescription> descriptions { get; set; }
 
         [JsonPropertyName("tradable")]
         public int tradable { get; set; }
@@ -65,7 +65,7 @@ namespace SteamLibrary.JSONs
         public int marketable { get; set; }
     }
 
-    public class Description
+    public class GameDescription
     {
         [JsonPropertyName("type")]
         public string type { get; set; }
@@ -74,7 +74,7 @@ namespace SteamLibrary.JSONs
         public string value { get; set; }
     }
 
-    public class Result
+    public class GameAsset
     {
         [JsonPropertyName("name")]
         public string name { get; set; }
@@ -104,7 +104,7 @@ namespace SteamLibrary.JSONs
         public string sale_price_text { get; set; }
     }
 
-    public class ItemList
+    public class GameAssetsPage
     {
         [JsonPropertyName("success")]
         public bool success { get; set; }
@@ -122,7 +122,7 @@ namespace SteamLibrary.JSONs
         public Searchdata searchdata { get; set; }
 
         [JsonPropertyName("results")]
-        public List<Result> results { get; set; }
+        public List<GameAsset> results { get; set; }
     }
 
     public class Searchdata

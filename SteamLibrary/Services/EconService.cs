@@ -7,11 +7,18 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.Json;
+using SteamLibrary.Callbacks;
 
 namespace SteamLibrary.Services
 {
     public class EconService: Service
     {
+        private static Dictionary<string, GameAsset> _gameAssets;
+        private static Dictionary<string, GameItemDef> _gameItemDefs;
+        private Dictionary<string, KeyValuePair<InventoryAsset, InventoryDescription>> _inventoryAssets;
+
+
         private SteamUnifiedMessages _steamUnifiedMessages;
         private SteamUnifiedMessages.UnifiedService<IEcon> _econUnifiedService;
         
@@ -22,6 +29,14 @@ namespace SteamLibrary.Services
             _steamUnifiedMessages = _account.SteamClient.GetHandler<SteamUnifiedMessages>();
             _econUnifiedService = _steamUnifiedMessages.CreateService<IEcon>();
             _getInventoryItemsWithDescriptionsRequestIDs = new List<JobID>();
+            _inventoryAssets = new Dictionary<string, KeyValuePair<InventoryAsset, InventoryDescription>>();
+            if (_gameAssets is null) {
+                _gameAssets = SteamMarket.GetGameAssets(1782210);
+            }
+            if (_gameItemDefs is null)
+            {
+                _gameItemDefs = SteamMarket.GetGameItemDefs("1782210", "E98CD32FEC0729EA09130DB1760843330474F4EC");
+            }
         }
 
         protected override void Subscribe()
@@ -29,15 +44,20 @@ namespace SteamLibrary.Services
             _callbackFunctionPointers = new List<IDisposable> {
                 _account.CallbackManager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn),
                 _account.CallbackManager.Subscribe<SteamUnifiedMessages.ServiceMethodResponse>(OnUnifiedMessageResponse),
-                _account.CallbackManager.Subscribe<SteamClient.DisconnectedCallback>(OnDisconnected)
+                _account.CallbackManager.Subscribe<SteamClient.DisconnectedCallback>(OnDisconnected),
+                _account.CallbackManager.Subscribe<CrarGameCaseOppened>(OnCrarGameCaseOppened)
             };
+        }
+
+        private void OnCrarGameCaseOppened(CrarGameCaseOppened callback) {
+            Console.WriteLine("Callback works!!!{0} {1}", callback.JobID, callback.ParentCallback.JobID);
         }
 
         private void OnLoggedOn(SteamUser.LoggedOnCallback callback)
         {
             if (callback.Result == EResult.OK)
             {
-                _getInventoryItemsWithDescriptionsRequestIDs.Add(GetInventoryItemsWithDescriptionsRequestIDs());
+                _getInventoryItemsWithDescriptionsRequestIDs.Add(GetInventoryItemsWithDescriptions());
             }
         }
 
@@ -51,21 +71,23 @@ namespace SteamLibrary.Services
         {
             if (_getInventoryItemsWithDescriptionsRequestIDs.Contains(callback.JobID))
             {
-                FindNamesAsync(callback.GetDeserializedResponse<CEcon_GetInventoryItemsWithDescriptions_Response>());
+                FindNames(callback.GetDeserializedResponse<CEcon_GetInventoryItemsWithDescriptions_Response>());
                 _getInventoryItemsWithDescriptionsRequestIDs.Remove(callback.JobID);
             }
         }
 
-        private void FindNamesAsync(CEcon_GetInventoryItemsWithDescriptions_Response resp) {
-            foreach (var desc in resp.descriptions) {
-                string price = SteamMarket.Test(desc);
-                _logger.Log("Maybe item name: " + desc.market_hash_name + " maybe price: " + price);
+        private void FindNames(CEcon_GetInventoryItemsWithDescriptions_Response resp) {
+            InventoryAssets assets = JSONUtils.ParseInventoryAssets(JsonSerializer.Serialize(resp));
+            _inventoryAssets = new Dictionary<string, KeyValuePair<InventoryAsset, InventoryDescription>>();
+            foreach (var desc in assets.descriptions) {
+                var asset = assets.assets.Where(x => x.classid == desc.classid).First();
+                _inventoryAssets.Add(desc.market_hash_name, new KeyValuePair<InventoryAsset, InventoryDescription>(asset, desc));
             }
         }
 
-        private JobID GetInventoryItemsWithDescriptionsRequestIDs()
+        private JobID GetInventoryItemsWithDescriptions()
         {
-            CEcon_GetInventoryItemsWithDescriptions_Request req = new CEcon_GetInventoryItemsWithDescriptions_Request()
+            CEcon_GetInventoryItemsWithDescriptions_Request req = new()
             {
                 steamid = _account.SteamClient.SteamID,
                 appid = 1782210,

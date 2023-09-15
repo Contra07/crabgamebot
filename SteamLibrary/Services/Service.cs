@@ -16,7 +16,7 @@ namespace SteamLibrary.Services
         protected bool _isRunning;
         protected string _serviceName;
 
-        public Service(SteamAccount account, Logger logger, string serviceName = "")
+        public Service(SteamAccount account, Logger logger, string serviceName = "NoName")
         {
             _account = account;
             _logger = logger;

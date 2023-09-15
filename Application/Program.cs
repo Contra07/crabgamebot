@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using SteamKit2.CDN;
 using SteamLibrary;
 using SteamLibrary.JSONs;
 using SteamLibrary.Services;
@@ -16,8 +17,9 @@ public class Program
         }
         foreach (Client client in clients)
         {
-            new Thread(client.Start).Start(); 
+            new Thread(client.Start).Start();
         }
+        //new Thread(clients[0].Start).Start();
         var run = true;
         // Thread th = new Thread(() =>
         // {
@@ -51,7 +53,8 @@ public class Program
                 new LoginService(Account, Logger),
                 new ItemService(Account, Logger),
                 new PlayService(Account, Logger),
-                new EconService(Account, Logger)
+                new EconService(Account, Logger),
+                new EconomyService(Account, Logger)
             };
         }
 

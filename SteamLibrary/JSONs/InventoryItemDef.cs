@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace SteamLibrary.JSONs;
 
-public class InventoryItem
+public class InventoryItemDef
 {
     [JsonPropertyName("accountid")]
     public string accountid { get; set; }
