@@ -1,12 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <Compile Remove="data\**" />
-    <EmbeddedResource Remove="data\**" />
-    <None Remove="data\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\SteamLibrary\SteamLibrary.csproj" />
   </ItemGroup>
 
