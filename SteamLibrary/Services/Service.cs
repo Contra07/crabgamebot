@@ -12,7 +12,7 @@ namespace SteamLibrary.Services
     {
         protected SteamAccount _account;
         protected Logger _logger;
-        protected List<IDisposable>? _callbackFunctionPointers;
+        protected List<IDisposable> _callbackFunctionPointers;
         protected bool _isRunning;
         protected string _serviceName;
 
@@ -33,7 +33,7 @@ namespace SteamLibrary.Services
         public bool Start()
         {
             if (_isRunning) { return false; }
-            if (_callbackFunctionPointers is not null) { return false; }
+            if (!(_callbackFunctionPointers is null)) { return false; }
             Subscribe();
             _logger.Log(_serviceName + " service started");
             return true;
@@ -43,7 +43,7 @@ namespace SteamLibrary.Services
 
         public void Stop()
         {
-            if (_callbackFunctionPointers is not null)
+            if (!(_callbackFunctionPointers is null))
             {
                 _callbackFunctionPointers.Clear();
                 _callbackFunctionPointers = null;

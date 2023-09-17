@@ -37,7 +37,7 @@ namespace SteamLibrary.Services
         }
 
         private void PlayGame() {
-            ClientMsgProtobuf<CMsgClientGamesPlayed> request = new(EMsg.ClientGamesPlayedWithDataBlob)
+            ClientMsgProtobuf<CMsgClientGamesPlayed> request = new ClientMsgProtobuf<CMsgClientGamesPlayed>(EMsg.ClientGamesPlayedWithDataBlob)
             {
                 Body = {
 				        // Underflow here is to be expected, this is Steam's logic

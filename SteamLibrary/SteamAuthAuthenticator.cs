@@ -28,7 +28,7 @@ namespace SteamLibrary
                 _logger.Log("The previous 2-factor auth code you have provided is incorrect.");
             }
 
-            string? code;
+            string code;
 
             do
             {
@@ -54,7 +54,7 @@ namespace SteamLibrary
             }
             while (string.IsNullOrEmpty(code));
 
-            return Task.FromResult(code!);
+            return Task.FromResult(code);
         }
 
         /// <inheritdoc />
@@ -65,7 +65,7 @@ namespace SteamLibrary
                 _logger.Log("The previous 2-factor auth code you have provided is incorrect.");
             }
 
-            string? code;
+            string code;
 
             do
             {
@@ -79,7 +79,7 @@ namespace SteamLibrary
             }
             while (string.IsNullOrEmpty(code));
 
-            return Task.FromResult(code!);
+            return Task.FromResult(code);
         }
 
         /// <inheritdoc />

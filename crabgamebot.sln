@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamLibrary", "SteamLibrar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamAuth", "SteamAuth\SteamAuth.csproj", "{5AD0934E-F6C4-4AE5-83AF-C788313B2A87}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SteamDatabase", "SteamDatabase\SteamDatabase.sqlproj", "{C5C5BC67-0C8B-4711-B207-E11CE329BD16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,12 +29,17 @@ Global
 		{5AD0934E-F6C4-4AE5-83AF-C788313B2A87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AD0934E-F6C4-4AE5-83AF-C788313B2A87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AD0934E-F6C4-4AE5-83AF-C788313B2A87}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E0EE4A80-A2FD-4C94-878B-CC22FAC2859A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E0EE4A80-A2FD-4C94-878B-CC22FAC2859A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E0EE4A80-A2FD-4C94-878B-CC22FAC2859A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E0EE4A80-A2FD-4C94-878B-CC22FAC2859A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5C5BC67-0C8B-4711-B207-E11CE329BD16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5C5BC67-0C8B-4711-B207-E11CE329BD16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5C5BC67-0C8B-4711-B207-E11CE329BD16}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{C5C5BC67-0C8B-4711-B207-E11CE329BD16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5C5BC67-0C8B-4711-B207-E11CE329BD16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5C5BC67-0C8B-4711-B207-E11CE329BD16}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B42F9FCC-8769-42D0-997C-4AEAD2945373}
 	EndGlobalSection
 EndGlobal

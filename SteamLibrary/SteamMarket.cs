@@ -26,7 +26,7 @@ namespace SteamLibrary
             {
                 string req = string.Format(srevice, appid, start, assetsnumber);
                 string answer = HttpGetResponse(baseurl, req);
-                if (answer is not null)
+                if (!(answer is null))
                 {
                     GameAssetsPage list = JSONUtils.ParseGameAssetPage(answer);
                     total = list.total_count;
@@ -48,7 +48,7 @@ namespace SteamLibrary
         public static Dictionary<string, GameItemDef> GetGameItemDefs(string appid, string digest) {
             Dictionary<string, GameItemDef> res = new Dictionary<string, GameItemDef>();
             List<GameItemDef> items = GetItemDefsArchive(appid, digest);
-            if (items is not null) {
+            if (!(items is null)) {
                 foreach (var item in items) {
                     res.Add(item.itemdefid, item);
                 }
@@ -61,7 +61,7 @@ namespace SteamLibrary
             string reqteamplate = "https://api.steampowered.com/IGameInventory/GetItemDefArchive/v1?appid={0}&digest={1}";
             string req = string.Format(reqteamplate, appid, digest);
             string answer = HttpGetResponse(baseadress, req);
-            if (answer is not null)
+            if (!(answer is null))
             {
                 return JSONUtils.ParseGameItemDefs(answer.Substring(0, answer.Length - 1));
             }

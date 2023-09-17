@@ -81,7 +81,7 @@ namespace SteamLibrary.Services
 
         private JobID GetInventoryItemsWithDescriptions()
         {
-            CEcon_GetInventoryItemsWithDescriptions_Request req = new()
+            CEcon_GetInventoryItemsWithDescriptions_Request req = new CEcon_GetInventoryItemsWithDescriptions_Request()
             {
                 steamid = _account.SteamClient.SteamID,
                 appid = 1782210,
