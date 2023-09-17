@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text.Json;
-using SteamLibrary.Callbacks;
 
 namespace SteamLibrary.Services
 {
@@ -45,12 +44,7 @@ namespace SteamLibrary.Services
                 _account.CallbackManager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOn),
                 _account.CallbackManager.Subscribe<SteamUnifiedMessages.ServiceMethodResponse>(OnUnifiedMessageResponse),
                 _account.CallbackManager.Subscribe<SteamClient.DisconnectedCallback>(OnDisconnected),
-                _account.CallbackManager.Subscribe<CrarGameCaseOppened>(OnCrarGameCaseOppened)
             };
-        }
-
-        private void OnCrarGameCaseOppened(CrarGameCaseOppened callback) {
-            Console.WriteLine("Callback works!!!{0} {1}", callback.JobID, callback.ParentCallback.JobID);
         }
 
         private void OnLoggedOn(SteamUser.LoggedOnCallback callback)

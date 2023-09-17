@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using SteamLibrary.JSONs;
 using System.Threading;
-using SteamLibrary.Callbacks;
 
 namespace SteamLibrary.Services
 {
@@ -63,7 +62,6 @@ namespace SteamLibrary.Services
             }
             if (callback.JobID == _getInventoryRequestID) {
                 _getInventoryRequestID = JobID.Invalid;
-                _account.SteamClient.PostCallback(new CrarGameCaseOppened(callback));
                 var cases = FindCases(callback.GetDeserializedResponse<CInventory_Response>());
                 OpenCases(cases);
             }
