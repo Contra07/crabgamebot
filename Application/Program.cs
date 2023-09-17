@@ -22,6 +22,7 @@ namespace Application
             {
                 new Thread(client.Start).Start();
             }
+            //Aboba
             //new Thread(clients[0].Start).Start();
             //var run = true;
             // Thread th = new Thread(() =>
