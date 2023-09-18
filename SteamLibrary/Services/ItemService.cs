@@ -93,6 +93,10 @@ namespace SteamLibrary.Services
 
         private async Task<List<InventoryItemDef>> GetDrop(uint appid, ulong itemdefid) {
             var resp = (await _inventoryService.ConsumePlaytime(appid, itemdefid)).GetDeserializedResponse<CInventory_Response>();
+            //if (string.IsNullOrEmpty(resp.item_json))
+            //{
+            //    return new List<InventoryItemDef>();
+            //}
             return JSONUtils.ParseInventoryItemDefs(resp.item_json);
         }
 
@@ -103,14 +107,17 @@ namespace SteamLibrary.Services
         }
 
         private async Task<List<InventoryItemDef>> OpenCrabCase(uint appid, InventoryItemDef box) {
-            var resp = await _inventoryService.ExchangeItem(
+            var resp = (await _inventoryService.ExchangeItem(
                     appid,
                     1302 - 1000 + ulong.Parse(box.itemdefid),
                     new Dictionary<ulong, uint> {
                         { ulong.Parse(box.itemid), 1}
                     }
-            );
-            return JSONUtils.ParseInventoryItemDefs(resp.GetDeserializedResponse<CInventory_Response>().itemdef_json);
+            )).GetDeserializedResponse<CInventory_Response>();
+            //if (string.IsNullOrEmpty(resp.item_json)) {
+            //    return new List<InventoryItemDef>();
+            //}
+            return JSONUtils.ParseInventoryItemDefs(resp.item_json);
         }
 
         private async Task<Dictionary<string, GameItemDef>> GetGameItemDefsAsync(uint appid) {
