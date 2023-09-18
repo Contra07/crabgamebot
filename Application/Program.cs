@@ -24,25 +24,25 @@ namespace Application
             }
             ////Aboba
             //new Thread(clients[0].Start).Start();
-            var run = true;
-            Thread th = new Thread(() =>
-            {
-                while (run)
-                {
-                    run = Console.ReadKey(false).KeyChar != 'p';
-                    Thread.Sleep(TimeSpan.FromMilliseconds(100));
-                }
-            });
-            th.Start();
-            while (run)
-            {
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
-            }
-            Console.WriteLine();
-            foreach (Client client in clients)
-            {
-                client.Stop();
-            }
+            //var run = true;
+            //Thread th = new Thread(() =>
+            //{
+            //    while (run)
+            //    {
+            //        run = Console.ReadKey(false).KeyChar != 'p';
+            //        Thread.Sleep(TimeSpan.FromMilliseconds(100));
+            //    }
+            //});
+            //th.Start();
+            //while (run)
+            //{
+            //    Thread.Sleep(TimeSpan.FromMilliseconds(100));
+            //}
+            //Console.WriteLine();
+            //foreach (Client client in clients)
+            //{
+            //    client.Stop();
+            //}
         }
 
         class Client

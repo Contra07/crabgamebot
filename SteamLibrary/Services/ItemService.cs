@@ -14,6 +14,7 @@ namespace SteamLibrary.Services
     public class ItemService: Service 
     {
         private const int _appid = 1782210;
+        private const int _timeExchanger = 1200;
         private SteamUnifiedMessages.UnifiedService<IInventory> _inventoryService;
         private bool _runCaseLoop;
         private int _tries;
@@ -42,14 +43,14 @@ namespace SteamLibrary.Services
             if (callback.Result == EResult.OK)
             {
                 _runCaseLoop = true;
-                _logger.Log("Starting case loop...");
                 await CaseLoopScript(_tries, _caseMinutesDelay, _dayHoursDelay);
+                _logger.Log("Starting case loop...");
             }
         }
 
         private void OnDisconnected(SteamClient.DisconnectedCallback callback) {
-            _logger.Log("Case loop stopping...");
             _runCaseLoop= false;
+            _logger.Log("Case loop stopping...");
         }
         
 
@@ -62,7 +63,7 @@ namespace SteamLibrary.Services
                 while (passes < tries)
                 {
                     _logger.Log($"Consuming playtime...");
-                    var cases = await GetDrop(_appid, 1200);
+                    var cases = await GetDrop(_appid, _timeExchanger);
                     if (cases.Count == 0)
                     {
                         _logger.Log($"No cases...");
@@ -76,16 +77,18 @@ namespace SteamLibrary.Services
                             _logger.Log($"From case {box.itemdefid}: {item.origin} {item.itemdefid}");
                         }
                     }
-                    Thread.Sleep(TimeSpan.FromMinutes(caseMinutesDelay));
                     passes++;
+
+                    _logger.Log($"Wating for {caseMinutesDelay} minutes");
+                    await Delay(TimeSpan.FromMinutes(caseMinutesDelay));
                 }
-                _logger.Log("Wating next day");
-                await HoursDelay(dayHoursDelay);
+                _logger.Log($"Wating next day for {dayHoursDelay} hours");
+                await Delay(TimeSpan.FromHours(dayHoursDelay));
             }
         }
 
-        private Task HoursDelay(int hours) {
-            return Task.Delay(TimeSpan.FromHours(hours));
+        private Task Delay(TimeSpan time) {
+            return Task.Delay(time);
         }
 
         private async Task<List<InventoryItemDef>> GetDrop(uint appid, ulong itemdefid) {
@@ -107,7 +110,6 @@ namespace SteamLibrary.Services
                         { ulong.Parse(box.itemid), 1}
                     }
             );
-
             return JSONUtils.ParseInventoryItemDefs(resp.GetDeserializedResponse<CInventory_Response>().itemdef_json);
         }
 
@@ -125,24 +127,6 @@ namespace SteamLibrary.Services
             }
             
             return items;
-        }
-
-        private List<InventoryItemDef> FindCases(CInventory_Response resp) {
-            _logger.Log($"Checking inventory...");
-            List<InventoryItemDef> items = JSONUtils.ParseInventoryItemDefs(resp.item_json);
-            List<InventoryItemDef> cases = new List<InventoryItemDef>();
-            foreach (var item in items)
-            {
-                if (item.itemdefid == "1000" ||
-                    item.itemdefid == "1001" ||
-                    item.itemdefid == "1002" ||
-                    item.itemdefid == "1003")
-                {
-                    cases.Add(item);
-                    _logger.Log($"Found case: {item.itemdefid}");
-                }
-            }
-            return cases;
         }
     }
 }
