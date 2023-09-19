@@ -13,6 +13,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <SelfContained>true</SelfContained>
+    <ContainerBaseImage>mcr.microsoft.com/dotnet/runtime:8.0.100-rc.1-alpine3</ContainerBaseImage>
     <ContainerImageName>dotnetSteamBotTest</ContainerImageName>
   </PropertyGroup>
 
