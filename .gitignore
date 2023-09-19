@@ -401,3 +401,4 @@ data/
 
 .devcontanier/
 .devcontainer/devcontainer.json
+test/

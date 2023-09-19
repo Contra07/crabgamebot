@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Threading;
-using SteamKit2.CDN;
 using SteamLibrary;
+using SteamLibrary.DataBase;
 using SteamLibrary.JSONs;
+using SteamLibrary.Models;
 using SteamLibrary.Services;
 
 namespace Application
@@ -13,8 +15,10 @@ namespace Application
     {
         public static void Main(string[] args)
         {
+            ConfigManager.ProtectConnectionStrings();
+            var db = new SteamDatabaseAccess(new SQLiteFactory());
             List<Client> clients = new List<Client>();
-            foreach (Credentials cred in JSONUtils.ParseUsers(args[0]))
+            foreach (AccountCredentialsModel cred in db.GetAccountsCredentialsAsync().Result)
             {
                 clients.Add(new Client(cred));
             }
@@ -52,7 +56,7 @@ namespace Application
 
             public List<IService> Services { get; set; }
 
-            public Client(Credentials cred)
+            public Client(AccountCredentialsModel cred)
             {
                 Account = new SteamAccount(cred);
                 Logger = new Logger(Account);

@@ -1,5 +1,5 @@
 ﻿using SteamKit2;
-using SteamLibrary.JSONs;
+using SteamLibrary.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace SteamLibrary
 {
     public class SteamAccount
     {
-        private Credentials _credentials;
+        private AccountCredentialsModel _credentials;
         private SteamClient _steamClient;
         private CallbackManager _callbackManager;
         private Thread _proccess;
@@ -23,7 +23,7 @@ namespace SteamLibrary
         internal SteamClient SteamClient { get { return _steamClient; } }
         internal CallbackManager CallbackManager { get { return _callbackManager; } }
 
-        public SteamAccount(Credentials credentials)
+        public SteamAccount(AccountCredentialsModel credentials)
         {
             _credentials = credentials;
             _steamClient = new SteamClient();

@@ -2,19 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using SteamLibrary.Models;
 
 namespace SteamLibrary.JSONs
 {
     public static class JSONUtils
     {
-        public static List<Credentials> ParseUsers(string path)
+        public static List<AccountCredentialsModel> ParseUsers(string path)
         {
-            JsonSerializerOptions options = new JsonSerializerOptions()
-            {
-                WriteIndented = true,
-                IncludeFields = true
-            };
-            return JsonSerializer.Deserialize<List<Credentials>>(File.ReadAllText(path), options);
+            return JsonSerializer.Deserialize<List<AccountCredentialsModel>>(File.ReadAllText(path));
         }
 
         public static List<InventoryItemDef> ParseInventoryItemDefs(string json)
