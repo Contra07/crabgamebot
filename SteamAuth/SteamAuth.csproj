@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyTitle>SteamAuth</AssemblyTitle>
     <Product>SteamAuth</Product>
+    <SelfContained>true</SelfContained>
     <Copyright>Copyright ©  2015</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
