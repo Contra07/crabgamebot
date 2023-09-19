@@ -15,7 +15,7 @@ namespace Application
     {
         public static void Main(string[] args)
         {
-            ConfigManager.ProtectConnectionStrings();
+            //ConfigManager.ProtectConnectionStrings();
             var db = new SteamDatabaseAccess(new SQLiteFactory());
             List<Client> clients = new List<Client>();
             foreach (AccountCredentialsModel cred in db.GetAccountsCredentialsAsync().Result)
