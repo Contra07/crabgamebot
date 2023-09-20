@@ -18,12 +18,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <SelfContained>true</SelfContained>
     <ContainerBaseImage>mcr.microsoft.com/dotnet/runtime-deps:8.0.0-rc.1-alpine3.18</ContainerBaseImage>
     <ContainerImageName>dotnetSteamBotTest</ContainerImageName>
-    <ContainerImageTag>1.0.0-alpha1;latest</ContainerImageTag>
+    <ContainerImageTags>1.0.0-alpha2;latest</ContainerImageTags>
     <StartupObject>Application.Program</StartupObject>
   </PropertyGroup>
 
