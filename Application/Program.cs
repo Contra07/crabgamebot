@@ -7,6 +7,10 @@ using SteamLibrary.DataBase;
 using SteamLibrary.JSONs;
 using SteamLibrary.Models;
 using SteamLibrary.Services;
+using FirebirdSql.Data;
+using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Common;
+using FirebirdSql.Data.Services;
 
 namespace Application
 {
@@ -15,8 +19,8 @@ namespace Application
     {
         public static void Main(string[] args)
         {
-            //ConfigManager.ProtectConnectionStrings();
-            var db = new SteamDatabaseAccess(new SQLiteFactory());
+           ;
+            var db = new SteamDatabaseAccess(FirebirdClientFactory.Instance);
             List<Client> clients = new List<Client>();
             foreach (AccountCredentialsModel cred in db.GetAccountsCredentialsAsync().Result)
             {
