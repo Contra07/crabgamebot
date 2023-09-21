@@ -20,6 +20,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
+    <PublishAot>true</PublishAot>
     <SelfContained>true</SelfContained>
     <ContainerBaseImage>mcr.microsoft.com/dotnet/runtime-deps:7.0.11-alpine3.18</ContainerBaseImage>
     <ContainerImageName>dotnetSteamBotTest</ContainerImageName>

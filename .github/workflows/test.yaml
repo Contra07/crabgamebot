@@ -35,9 +35,14 @@ jobs:
         -   name: Publish
             run: dotnet publish Application/Application.csproj -r linux-x64 -c Release
 
-        -   name: Upload Artifact
+        -   name: Upload Publish Artifact
             uses: actions/upload-artifact@v3
             with:
                 name: SteamBot
                 path: Application/bin/Release/net7.0/linux-x64/publish/
+        -   name: Upload Aot Artifact
+            uses: actions/upload-artifact@v3
+            with:
+                name: SteamBot_aot
+                path: Application/bin/Release/net7.0/linux-x64/native/
 
