@@ -1,21 +1,43 @@
-name: test-action
+name: CI/CD
 on: 
-  push:
-    branches: [master, main]
+    push:
+        branches: [master, main]
 
 jobs:
-  build:
-      runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
+        steps:
+        -   name: Checkout
+            uses: actions/checkout@v4
+        -   name: Setup .NET
+            uses: actions/setup-dotnet@v3
+            with:
+                dotnet-version: '8.0.x'
+                dotnet-quality: 'preview'
+        -   name: Restore dependencies
+            run:  dotnet restore
+        -   name: Build
+            run: dotnet build ./Application/Application.csproj --no-restore
+    
+    artifacts:
+        name: Create artifact
 
-      steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-          dotnet-quality: 'preview'
-      - name: Restore dependencies
-        run:  dotnet restore
-      - name: Build
-        run: dotnet build ./Application/Application.csproj --no-restore
+        runs-on: ubuntu-latest
+
+        steps:
+        -   name: Checkout
+            uses: actions/checkout@v4
+        -   name: Setup .NET
+            uses: actions/setup-dotnet@v3
+            with:
+                dotnet-version: '8.0.x'
+                dotnet-quality: 'preview'
+        -   name: Publish
+            run: dotnet publish Application/Application.csproj -r linux-x64 -c Release
+
+        -   name: Upload Artifact
+            uses: actions/upload-artifact@v3
+            with:
+                name: SteamBot
+                path: Application/bin/Release/net7.0/linux-x64/native
+
