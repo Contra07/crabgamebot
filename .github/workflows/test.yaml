@@ -39,5 +39,5 @@ jobs:
             uses: actions/upload-artifact@v3
             with:
                 name: SteamBot
-                path: Application/bin/Release/net7.0/linux-x64/native
+                path: Application/bin/Release/net7.0/linux-x64/publish/
 
