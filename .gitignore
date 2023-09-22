@@ -402,3 +402,4 @@ data/
 .devcontanier/
 .devcontainer/devcontainer.json
 test/
+/Application/App.Debug.config

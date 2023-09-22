@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Threading;
 using SteamLibrary;
 using SteamLibrary.DataBase;

@@ -129,7 +129,7 @@ namespace SteamLibrary.Services
                     items = SteamMarket.GetGameItemDefs(appid.ToString(), (ItemDefMetaResponse.GetDeserializedResponse<CInventory_GetItemDefMeta_Response>()).digest);
                 }
             }
-            catch (TaskCanceledException ex) {
+            catch {
                 _logger.Log("Task GetItemDefMeta was canceled");
             }
             

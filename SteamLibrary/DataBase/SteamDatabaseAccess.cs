@@ -127,6 +127,7 @@ namespace SteamLibrary.DataBase
 
         private static string LoadConnectionString(string id = "Default")
         {
+            //ConfigurationManager.OpenMappedMachineConfiguration()
             return ConfigurationManager.ConnectionStrings[id].ConnectionString;
         }
     }

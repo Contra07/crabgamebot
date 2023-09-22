@@ -59,7 +59,7 @@ namespace SteamLibrary.Services
                     Thread.Sleep(time);
                 }
             }
-            catch(ThreadInterruptedException ex) {
+            catch{
                 _logger.Log($"Stoped playing game");
             }
             

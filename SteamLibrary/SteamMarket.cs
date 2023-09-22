@@ -81,7 +81,7 @@ namespace SteamLibrary
                 getAnswer.Wait();
                 return getAnswer.Result;
             }
-            catch (Exception ex)
+            catch 
             {
                 return null;
             }
