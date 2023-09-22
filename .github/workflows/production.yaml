@@ -23,7 +23,7 @@ jobs:
             with:
                 files: 'Application/App.Release.config'
             env:
-                ConnectionString: ${{ secrets.CONNECTION_STRING }}
+                ConnectionStrings.Default.connectionString: ${{ secrets.CONNECTION_STRING }}
 
         -   name: Publish
             run: dotnet publish Application/Application.csproj -r linux-x64 -c Release
