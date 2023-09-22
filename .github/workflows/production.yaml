@@ -4,26 +4,11 @@ on:
         branches: [master, main]
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-        -   name: Checkout
-            uses: actions/checkout@v4
-        -   name: Setup .NET
-            uses: actions/setup-dotnet@v3
-            with:
-                dotnet-version: '8.0.x'
-                dotnet-quality: 'preview'
-        -   name: Restore dependencies
-            run:  dotnet restore
-        -   name: Build
-            run: dotnet build ./Application/Application.csproj --no-restore
-    
     artifacts:
         name: Create artifact
-
         runs-on: ubuntu-latest
-
+        environment:
+            name: Production
         steps:
         -   name: Checkout
             uses: actions/checkout@v4
@@ -32,6 +17,14 @@ jobs:
             with:
                 dotnet-version: '8.0.x'
                 dotnet-quality: 'preview'
+
+        -   name: App.Config
+            uses: microsoft/variable-substitution@v1
+            with:
+                files: 'Application/App.Release.config'
+            env:
+                ConnectionStrings.Default: ${{ secrets.CONNECTION_STRING }}
+
         -   name: Publish
             run: dotnet publish Application/Application.csproj -r linux-x64 -c Release
 
@@ -40,9 +33,4 @@ jobs:
             with:
                 name: SteamBot
                 path: Application/bin/Release/net7.0/linux-x64/publish/
-        -   name: Upload Aot Artifact
-            uses: actions/upload-artifact@v3
-            with:
-                name: SteamBot_aot
-                path: Application/bin/Release/net7.0/linux-x64/native/
 
