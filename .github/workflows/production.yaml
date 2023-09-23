@@ -43,6 +43,9 @@ jobs:
               username: ${{ secrets.DOCKER_USERNAME }}
               password: ${{ secrets.DOCKER_PASSWORD }}
         
+        -   name: Tag image
+            run: docker tag ${{ secrets.IMAGE_NAME }} ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.IMAGE_NAME }}
+        
         -   name: Publish to Docker Hub registry
-            run: docker push ${{ secrets.DOCKER_REGISTRY }}
+            run: docker push ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.IMAGE_NAME }}
 
