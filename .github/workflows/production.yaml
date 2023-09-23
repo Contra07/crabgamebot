@@ -44,5 +44,5 @@ jobs:
               password: ${{ secrets.DOCKER_PASSWORD }}
         
         -   name: Publish to Docker Hub registry
-            run: docker image push docker push contraru/contraserver
+            run: docker push ${{ DOCKER_REGISTRY }}
 
