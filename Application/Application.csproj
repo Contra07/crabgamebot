@@ -12,6 +12,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <ImplicitUsings>disable</ImplicitUsings>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
   
   <PropertyGroup>
@@ -21,7 +22,7 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <PublishAot>false</PublishAot>
-    <SelfContained>true</SelfContained>
+    <SelfContained>false</SelfContained>
     <StartupObject>Application.Program</StartupObject>
   </PropertyGroup>
 

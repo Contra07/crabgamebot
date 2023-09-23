@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SteamLibrary.DataBase
@@ -126,8 +127,13 @@ namespace SteamLibrary.DataBase
 
         private static string LoadConnectionString(string id = "Default")
         {
-            var s = new ConfigurationBuilder().AddXmlFile("Application.dll.config").Build();
-            return s.GetValue<string>("connectionStrings:add:" + id + " :connectionString");
+            var configuration = new ConfigurationBuilder().AddXmlFile("Application.dll.config").Build();
+            StringBuilder builder = new StringBuilder();
+            builder.Append("connectionStrings:add:");
+            builder.Append(id);
+            builder.Append(":connectionString");
+            var line = builder.ToString();
+            return configuration.GetValue<string>(line);
         }
     }
 }
