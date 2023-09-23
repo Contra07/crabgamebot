@@ -1,7 +1,7 @@
-﻿using SteamLibrary.Models;
+﻿using Microsoft.Extensions.Configuration;
+using SteamLibrary.Models;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Threading.Tasks;
@@ -124,11 +124,10 @@ namespace SteamLibrary.DataBase
             return task;
         }
 
-
         private static string LoadConnectionString(string id = "Default")
         {
-            //ConfigurationManager.OpenMappedMachineConfiguration()
-            return ConfigurationManager.ConnectionStrings[id].ConnectionString;
+            var s = new ConfigurationBuilder().AddXmlFile("Application.dll.config").Build();
+            return s.GetValue<string>("connectionStrings:add:" + id + " :connectionString");
         }
     }
 }
