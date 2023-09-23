@@ -44,5 +44,5 @@ jobs:
               password: ${{ secrets.DOCKER_PASSWORD }}
         
         -   name: Publish to Docker Hub registry
-            run: docker push ${{ DOCKER_REGISTRY }}
+            run: docker push ${{ secrets.DOCKER_REGISTRY }}
 
