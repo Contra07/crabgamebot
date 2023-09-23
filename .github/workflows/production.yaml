@@ -4,8 +4,8 @@ on:
         branches: [master, main]
 
 jobs:
-    artifacts:
-        name: Create artifact
+    publish:
+        name: Publish artifact and contanier
         runs-on: ubuntu-latest
         environment:
             name: Production
@@ -25,7 +25,7 @@ jobs:
             env:
                 connectionString: ${{ secrets.CONNECTION_STRING }}
 
-        -   name: Publish
+        -   name: Publish Artifact
             run: dotnet publish Application/Application.csproj -r linux-x64 -c Release
 
         -   name: Upload Publish Artifact
@@ -33,4 +33,16 @@ jobs:
             with:
                 name: SteamBot
                 path: Application/bin/Release/net7.0/linux-x64/publish/
+        
+        -   name: Publish Cotanier
+            run: dotnet publish Application/Application.csproj -r linux-x64 -c Release /t:PublishContainer
+
+        -   name: Log in to Docker Hub
+            uses: docker/login-action@v2
+            with:
+              username: ${{ secrets.DOCKER_USERNAME }}
+              password: ${{ secrets.DOCKER_PASSWORD }}
+        
+        -   name: Publish to Docker Hub registry
+            run: docker image push docker push contraru/contraserver
 

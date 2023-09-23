@@ -29,7 +29,7 @@
   <PropertyGroup>
     <ContainerBaseImage>mcr.microsoft.com/dotnet/runtime:7.0</ContainerBaseImage>
     <ContainerImageName>dotnetSteamBotTest</ContainerImageName>
-    <ContainerImageTags>1.0.0-alpha2;latest</ContainerImageTags>
+    <ContainerImageTags>1.0.0-alpha3;latest</ContainerImageTags>
   </PropertyGroup>
 
 </Project>
